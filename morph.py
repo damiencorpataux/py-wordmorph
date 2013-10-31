@@ -37,23 +37,40 @@ def neighbourhood(word, words, max_distance=1):
             neighbours.append(candidate)
     return neighbours
 
-def fu(source, target, maxdepth=10, current=[], paths=[]):
+def fu(source, target, maxlength=10, current=[], paths=[]):
     if not current: current = [source]
-    words = allwords()
-    words = set(words) - set(current)
+    words = set(allwords()) - set(current)
     for word in neighbourhood(current[-1], words):
         current.append(word)
+        print len(current), maxlength
         if (word == target):
             print "FOUND:", len(current), current
-            paths.append(current)
-            current = current[:-1]
-        #elif len(current) < maxdepth:
-            print len(current), maxdepth
-            return fu(current[-1], target, maxdepth, current, paths)
-    return paths
+            #paths.append(current)
+        if len(current) < maxlength:
+            fu(current[-1], target, maxlength, current, paths)
+
+def nextpath(path):
+    words = set(allwords()) - set(path)
+    return [path+[word] for word in neighbourhood(path[-1], words)]
+         
+
+def find(source, target):
+    path = []
+    solutions = []
+    if not path: path = [source]
+    for p in nextpath(path):
+        print p
+        if p[-1] == target:
+            solutions.append(p)
+            print "FOUND:", p
+    return solutions
+
 
 if __name__ == '__main__':
-    paths = fu('cast', 'cash', 10)#'hurt')
-    print 'RESULT:'
-    for path in paths:
-        print len(path), path
+    paths = find('cast', 'cash')
+    print "--8<-----"
+    print paths
+    #paths = fu('cast', 'cash', 10)#'hurt')
+    #print 'RESULT:'
+    #for path in paths:
+    #    print len(path), path
