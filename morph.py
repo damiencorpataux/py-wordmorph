@@ -1,5 +1,8 @@
 #!/usr/bin/python
 
+# FIXME: Handle from:cast to:cast case
+#        Optimize to find shortest parth first
+
 dictionary_cache = []
 def dictionary(file='wordlist.clean'):
     """Returns a list of words contained in the given file.
@@ -55,6 +58,7 @@ def find(source, target, maxlength=3, distance=1, path=[]):
     solutions = []
     if len(path) < maxlength:
         for p in nextpath(path, distance):
+            print p
             if p[-1] == target: solutions.append(p)
             solutions += find(p[-1], target, maxlength, distance, p)
     return solutions
@@ -76,16 +80,17 @@ def cli():
     )
     parser.add_argument('--maxlength',
         default=4,
+        type=int,
         metavar='int',
         help='max words contained in a morph path'
     )
     parser.add_argument('--distance',
         default=1,
+        type=int,
         metavar='int',
         help='max distance between two words'
     )
     args = parser.parse_args().__dict__
-    print args
     # --from and --to are mandatory, although argparser doesnt support this
     missing = [key for key in ['source', 'target'] if not args.get(key)]
     if missing:
