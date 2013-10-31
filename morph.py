@@ -1,19 +1,13 @@
 #!/usr/bin/python
 
-options = {
-    'from': 'cast',
-    'to': 'hurt',
-    'wordlist': 'wordlist.clean'
-}
-
 dictionary_cache = []
-def dictionary(file='wordlist'):
+def dictionary(file='wordlist.clean'):
     """Returns a list of words contained in the given file.
     The given file should contain EOL-separated words.
     """
     global dictionary_cache
     if (dictionary_cache): return dictionary_cache
-    with open(options.get(file)) as f:
+    with open(file) as f:
         dictionary_cache = f.read().splitlines()
     return dictionary_cache
 
@@ -66,7 +60,43 @@ def find(source, target, maxlength=3, distance=1, path=[]):
     return solutions
 
 
-if __name__ == '__main__':
-    paths = find('cast', 'cash', 3)
+def cli():
+    import sys, argparse
+    # Using argparser to manage cli argument and help blurb
+    parser = argparse.ArgumentParser(description='Generate paths between words')
+    parser.add_argument('--from',
+        dest='source',
+        metavar='word',
+        help='the word to be used as source node (mandatory)'
+    )
+    parser.add_argument('--to',
+        dest='target',
+        metavar='word',
+        help='the word to be used as target node (mandatory)'
+    )
+    parser.add_argument('--maxlength',
+        default=4,
+        metavar='int',
+        help='max words contained in a morph path'
+    )
+    parser.add_argument('--distance',
+        default=1,
+        metavar='int',
+        help='max distance between two words'
+    )
+    args = parser.parse_args().__dict__
+    print args
+    # --from and --to are mandatory, although argparser doesnt support this
+    missing = [key for key in ['source', 'target'] if not args.get(key)]
+    if missing:
+        parser.print_help()
+        sys.exit(1)
+    # Actual algorithm execution
+    paths = find(**args)
+    # Results display
     for path in paths:
         print len(path), path
+
+
+if __name__ == '__main__':
+    cli()
