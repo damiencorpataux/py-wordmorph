@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
 # FIXME: Handle from:cast to:cast case
-#        Optimize to find shortest parth first
+#        Yield results to enable yielding found paths
+#        Optimize to find shortest parth first, better algo complexity:
+#        try to change nextpath() instructions order to test shorter combinaisons first
 
 dictionary_cache = []
 def dictionary(file='wordlist.clean'):
