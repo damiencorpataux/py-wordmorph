@@ -63,6 +63,11 @@ def find(source, target):
         if p[-1] == target:
             solutions.append(p)
             print "FOUND:", p
+        for p in nextpath(p):
+            print p
+            if p[-1] == target:
+                solutions.append(p)
+                print "FOUND:", p
     return solutions
 
 
