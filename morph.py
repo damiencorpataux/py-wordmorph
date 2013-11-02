@@ -43,8 +43,7 @@ def nextpath(path, distance):
     """Returns list of next possible words-paths
     according the given 'path' and 'distance'.
     The returned list never contains duplicate words
-    (this is mandatory for avoiding
-    loops).
+    (this is mandatory for avoiding graph loops).
     """
     words = set(dictionary()) - set(path)
     return [path+[word] for word in neighbourhood(path[-1], words, distance)]
@@ -60,7 +59,7 @@ def find(source, target, maxlength=3, distance=1, path=[]):
     solutions = []
     if len(path) < maxlength:
         for p in nextpath(path, distance):
-            print p
+            #print p
             if p[-1] == target: solutions.append(p)
             solutions += find(p[-1], target, maxlength, distance, p)
     return solutions
@@ -98,10 +97,8 @@ def cli():
     if missing:
         parser.print_help()
         sys.exit(1)
-    # Actual algorithm execution
-    paths = find(**args)
     # Results display
-    for path in paths:
+    for path in find(**args):
         print len(path), path
 
 

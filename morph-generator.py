@@ -10,6 +10,7 @@ def dictionary(file='wordlist.clean'):
     """Returns a list of words contained in the given file.
     The given file should contain EOL-separated words.
     """
+    # FIXME: Use a cache decorator
     global dictionary_cache
     if (dictionary_cache): return dictionary_cache
     with open(file) as f:
