@@ -10,6 +10,7 @@ def dictionary(file='wordlist.clean'):
     """Returns a list of words contained in the given file.
     The given file should contain EOL-separated words.
     """
+    # FIXME: Use a cache decorator
     global dictionary_cache
     if (dictionary_cache): return dictionary_cache
     with open(file) as f:
@@ -37,7 +38,9 @@ def neighbourhood(word, words, distance=1):
     length as the 'word', and a maximum number of n characters
     defined by 'max_distance'
     """
-    return [candidate for candidate in words if isdistance(distance, candidate, word)]
+    for candidate in words:
+        if isdistance(distance, candidate, word):
+            yield candidate
 
 def nextpath(path, distance):
     """Returns list of next possible words-paths
@@ -46,8 +49,7 @@ def nextpath(path, distance):
     (this is mandatory for avoiding graph loops).
     """
     words = set(dictionary()) - set(path)
-    return [path+[word] for word in neighbourhood(path[-1], words, distance)]
-         
+    for word in neighbourhood(path[-1], words, distance): yield path+[word]
 
 def find(source, target, maxlength=3, distance=1, path=[]):
     """Recursively looks up for all possible word-paths between two words.
@@ -56,14 +58,11 @@ def find(source, target, maxlength=3, distance=1, path=[]):
     - the 'maxlength' of the path
     """
     if not path: path = [source]
-    solutions = []
     if len(path) < maxlength:
         for p in nextpath(path, distance):
-            #print p
-            if p[-1] == target: solutions.append(p)
-            solutions += find(p[-1], target, maxlength, distance, p)
-    return solutions
-
+            if p[-1] == target: yield p
+            for x in find(p[-1], target, maxlength, distance, p):
+                yield x
 
 def cli():
     import sys, argparse
@@ -98,8 +97,9 @@ def cli():
         parser.print_help()
         sys.exit(1)
     # Results display
-    for path in find(**args):
-        print len(path), path
+    paths = find(**args)
+    for path in paths:
+        print "{0}: {1}".format(len(path), path)
 
 
 if __name__ == '__main__':

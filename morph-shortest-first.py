@@ -7,9 +7,6 @@
 
 dictionary_cache = []
 def dictionary(file='wordlist.clean'):
-    """Returns a list of words contained in the given file.
-    The given file should contain EOL-separated words.
-    """
     global dictionary_cache
     if (dictionary_cache): return dictionary_cache
     with open(file) as f:
@@ -17,12 +14,6 @@ def dictionary(file='wordlist.clean'):
     return dictionary_cache
 
 def isdistance(distance, word1, word2):
-    """Returns True if the distance between 'word1' and 'word2' is 'distance',
-    False otherwise.
-    The distance is the count of different characters between the given words.
-    For optimization purpose and fitness to our usecase, None is returned
-    if words have different lengths.
-    """
     if len(word1) != len(word2): return None
     actual = 0
     for i, l in enumerate(word1):
@@ -32,38 +23,32 @@ def isdistance(distance, word1, word2):
     else: return False
 
 def neighbourhood(word, words, distance=1):
-    """Determines and returns the neighbours of the given word.
-    A neighbour is a word from the 'words' list that has the same
-    length as the 'word', and a maximum number of n characters
-    defined by 'max_distance'
-    """
-    return [candidate for candidate in words if isdistance(distance, candidate, word)]
+    for candidate in words:
+        if isdistance(distance, candidate, word):
+            yield candidate
 
 def nextpath(path, distance):
-    """Returns list of next possible words-paths
-    according the given 'path' and 'distance'.
-    The returned list never contains duplicate words
-    (this is mandatory for avoiding graph loops).
-    """
     words = set(dictionary()) - set(path)
-    return [path+[word] for word in neighbourhood(path[-1], words, distance)]
-         
+    for word in neighbourhood(path[-1], words, distance): yield path+[word]
 
-def find(source, target, maxlength=3, distance=1, path=[]):
-    """Recursively looks up for all possible word-paths between two words.
-    Valid paths satisfy 2 conditions:
-    - the 'distance' between two nodes in the path
-    - the 'maxlength' of the path
+def combine(word, length, distance, path=[]):
+    """Returns all possible combinations of paths starting with path
+    with fixed length and neighbourhood distance
     """
-    if not path: path = [source]
-    solutions = []
-    if len(path) < maxlength:
-        for p in nextpath(path, distance):
-            #print p
-            if p[-1] == target: solutions.append(p)
-            solutions += find(p[-1], target, maxlength, distance, p)
-    return solutions
+    if not path: path = [word]
+    for p in nextpath(path, distance):
+        if len(p) == length: yield p
+        if len(p) < length:
+            for x in combine(None, length, distance, p):
+                yield x
 
+def find(source, target, maxlength=None, distance=None):
+    # Inneficient but simple logic that yields shortests first
+    for length in range(2, maxlength+1):
+        for candidate in combine(source, length, distance):
+            if candidate[-1] == target:
+                print "####", candidate
+                yield candidate
 
 def cli():
     import sys, argparse
@@ -98,7 +83,9 @@ def cli():
         parser.print_help()
         sys.exit(1)
     # Results display
-    for path in find(**args):
+    paths = [path for path in find(**args)]
+    print '---8<----'
+    for path in paths:
         print len(path), path
 
 
