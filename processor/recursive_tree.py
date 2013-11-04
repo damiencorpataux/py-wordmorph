@@ -1,21 +1,6 @@
 #!/usr/bin/python
 
 # FIXME: Handle from:cast to:cast case
-#        Yield results to enable yielding found paths
-#        Optimize to find shortest parth first, better algo complexity:
-#        try to change nextpath() instructions order to test shorter combinaisons first
-
-dictionary_cache = []
-def dictionary(file='wordlist.clean'):
-    """Returns a list of words contained in the given file.
-    The given file should contain EOL-separated words.
-    """
-    # FIXME: Use a cache decorator
-    global dictionary_cache
-    if (dictionary_cache): return dictionary_cache
-    with open(file) as f:
-        dictionary_cache = f.read().splitlines()
-    return dictionary_cache
 
 def isdistance(distance, word1, word2):
     """Returns True if the distance between 'word1' and 'word2' is 'distance',
@@ -42,16 +27,16 @@ def neighbourhood(word, words, distance=1):
         if isdistance(distance, candidate, word):
             yield candidate
 
-def nextpath(path, distance):
+def nextpath(path, words, distance):
     """Returns list of next possible words-paths
     according the given 'path' and 'distance'.
     The returned list never contains duplicate words
     (this is mandatory for avoiding graph loops).
     """
-    words = set(dictionary()) - set(path)
+    words = set(words) - set(path)
     for word in neighbourhood(path[-1], words, distance): yield path+[word]
 
-def find(source, target, maxlength=3, distance=1, path=[]):
+def find(source, target, words, maxlength=3, distance=1, path=[]):
     """Recursively looks up for all possible word-paths between two words.
     Valid paths satisfy 2 conditions:
     - the 'distance' between two nodes in the path
@@ -59,48 +44,7 @@ def find(source, target, maxlength=3, distance=1, path=[]):
     """
     if not path: path = [source]
     if len(path) < maxlength:
-        for p in nextpath(path, distance):
+        for p in nextpath(path, words, distance):
             if p[-1] == target: yield p
             for x in find(p[-1], target, maxlength, distance, p):
                 yield x
-
-def cli():
-    import sys, argparse
-    # Using argparser to manage cli argument and help blurb
-    parser = argparse.ArgumentParser(description='Generate paths between words')
-    parser.add_argument('--from',
-        dest='source',
-        metavar='word',
-        help='the word to be used as source node (mandatory)'
-    )
-    parser.add_argument('--to',
-        dest='target',
-        metavar='word',
-        help='the word to be used as target node (mandatory)'
-    )
-    parser.add_argument('--maxlength',
-        default=4,
-        type=int,
-        metavar='int',
-        help='max words contained in a morph path'
-    )
-    parser.add_argument('--distance',
-        default=1,
-        type=int,
-        metavar='int',
-        help='max distance between two words'
-    )
-    args = parser.parse_args().__dict__
-    # --from and --to are mandatory, although argparser doesnt support this
-    missing = [key for key in ['source', 'target'] if not args.get(key)]
-    if missing:
-        parser.print_help()
-        sys.exit(1)
-    # Results display
-    paths = find(**args)
-    for path in paths:
-        print "{0}: {1}".format(len(path), path)
-
-
-if __name__ == '__main__':
-    cli()
