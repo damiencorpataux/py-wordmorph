@@ -64,7 +64,7 @@ def cli():
         help='the word to be used as target node (mandatory)'
     )
     parser.add_argument('--maxlength',
-        default=4,
+        default=6,
         type=int,
         metavar='int',
         help='max words contained in a morph path'
