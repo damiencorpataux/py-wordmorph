@@ -1,14 +1,12 @@
 #!/usr/bin/python
 
-import sys
+import sys, argparse
 
 def dictionary(file):
     f = open(file, 'r') if file else sys.stdin
     for line in f: yield line.strip()
 
 def args():
-    import sys, argparse
-    # Using argparser to manage cli argument and help blurb
     parser = argparse.ArgumentParser(description='Outputs the shortest path between two words')
     parser.add_argument('--from',
         dest='source',
@@ -26,10 +24,10 @@ def args():
         help='filename of the wordlist to be used (reads stdin if not specified)'
     )
     parser.add_argument('--processor',
-        default='shortest_first',
+        default='combinatory',
         dest='processor',
-        metavar='processor',
-        help='algorithm implementation to use for word processing (default: shortest_first)'
+        metavar='name',
+        help='algorithm implementation to use for word processing (default: combinatory)'
     )
     parser.add_argument('--maxlength',
         default=4,

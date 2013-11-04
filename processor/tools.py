@@ -1,7 +1,5 @@
 #!/usr/bin/python
 
-# FIXME: Handle from:cast to:cast case
-
 def isdistance(distance, word1, word2):
     """Returns True if the distance between 'word1' and 'word2' is 'distance',
     False otherwise.
@@ -35,16 +33,3 @@ def nextpath(path, words, distance):
     """
     words = set(words) - set(path)
     for word in neighbourhood(path[-1], words, distance): yield path+[word]
-
-def find(source, target, words, maxlength=3, distance=1, path=[]):
-    """Recursively looks up for all possible word-paths between two words.
-    Valid paths satisfy 2 conditions:
-    - the 'distance' between two nodes in the path
-    - the 'maxlength' of the path
-    """
-    if not path: path = [source]
-    if len(path) < maxlength:
-        for p in nextpath(path, words, distance):
-            if p[-1] == target: yield p
-            for x in find(p[-1], target, maxlength, distance, p):
-                yield x
