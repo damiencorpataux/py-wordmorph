@@ -7,9 +7,9 @@ class ConsistencyTest(unittest.TestCase):
     def test(self):
         """Processors should return the same unordered results.
         """
+        import processor.tools
         import processor.combinatory
         import processor.recursive
-        import processor.tools
         args = {
             'source': 'cast',
             'target': 'cash',

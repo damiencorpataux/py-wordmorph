@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import tools
+import logging as log
 
 def combine(path, words, length, distance):
     """Returns all possible combinations of words starting with path
@@ -18,6 +19,7 @@ def find(source, target, words, maxlength=4, distance=1):
     for length in range(2, maxlength+1):
         for candidate in combine(source, words, length, distance):
             if candidate[-1] == target:
+                log.info('Found path: %s', candidate)
                 yield candidate
 
 if __name__ == '__main__':

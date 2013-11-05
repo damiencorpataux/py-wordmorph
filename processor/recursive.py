@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import tools
+import logging as log
 
 def find(source, target, words, maxlength=3, distance=1):
     """Recursively looks up for all possible word-paths between two words.
@@ -13,6 +14,7 @@ def find(source, target, words, maxlength=3, distance=1):
         for path in tools.nextpath(source, words, distance):
             if path[-1] == target: yield path
             for path in find(path, target, words, maxlength, distance):
+                log.info('Found path: %s', path)
                 yield path
 
 if __name__ == '__main__':

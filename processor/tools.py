@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import sys
+import logging as log
 
 def isdistance(distance, word1, word2):
     """Returns True if the distance between 'word1' and 'word2' is 'distance',
@@ -25,6 +26,7 @@ def neighbourhood(word, words, distance=1):
     """
     for candidate in words:
         if isdistance(distance, candidate, word):
+            log.debug('Next neighbour word: %s', candidate)
             yield candidate
 
 def nextpath(path, words, distance):
@@ -34,7 +36,9 @@ def nextpath(path, words, distance):
     (this is mandatory for avoiding graph loops).
     """
     words = set(words) - set(path)
-    for word in neighbourhood(path[-1], words, distance): yield path+[word]
+    for word in neighbourhood(path[-1], words, distance):
+        log.debug('Next neighbour path: %s', path+[word])
+        yield path+[word]
 
 def read(file):
     """Yields file lines if specified, stdin otherwise.
@@ -51,7 +55,9 @@ def strip(lines):
     for line in lines:
         # FIXME: Proposal: if line letters not in /[a-z]/
         #        which is the condition for the algorithm to work
-        if [l for l in line if l.isupper()] or "'" in line: continue
+        if [l for l in line if l.isupper()] or "'" in line:
+                log.debug('Stripped line: %s', line)
+                continue
         yield line
 
 def write(file, lines):
