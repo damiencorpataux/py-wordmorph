@@ -3,18 +3,32 @@ py-wordmorph
 
 A basic python word morphing library.
 
-```script.py``` outputs the first shortest path found between two given words.
+```script.py``` outputs the first path found between two given words.
 
 
 ### Usage
-
-1. Strip the word list in order to obtain a clean wordlist to process (eg. no quotes or caps)<br>
+**Strip the word list in order to obtain a clean wordlist to process (eg. no quotes or caps):**
 ```
-cat linuxwords | python strip.py
-```
-2. Morph words<br>
-```
-python script.py --from cast --to hurt
+python strip.py -i linuxwords -o words
 ```
 
-More options: ```python script.py -h```
+**Morph words:**
+```
+python script.py --wordlist words --from cast --to hurt
+```
+
+You can also pipe data:
+```
+cat linuxwords | python strip.py | python script.py --wordlist words --from cast --to hurt
+```
+
+
+### More options
+```python script.py -h``` and ```python strip.py -h```
+
+
+### Unittests
+Run the unittests:
+```
+python tests/consistency.py
+```
