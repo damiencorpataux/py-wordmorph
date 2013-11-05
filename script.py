@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import sys, argparse
+import logging
 
 def dictionary(file):
     f = open(file, 'r') if file else sys.stdin
@@ -41,12 +42,19 @@ def args():
         metavar='int',
         help='max distance between two words'
     )
+    parser.add_argument('--log',
+        metavar='level',
+        help='logging level (DEBUG, INFO)'
+    )
     args = parser.parse_args().__dict__
     # --from and --to are mandatory, although argparser doesnt support this
     missing = [key for key in ['source', 'target'] if not args.get(key)]
     if missing:
         parser.print_help()
         sys.exit(1)
+    # Setups loggin level
+    level = args.pop('log', None)
+    if level: logging.basicConfig(level=getattr(logging, level))
     return args
 
 def process(args):
