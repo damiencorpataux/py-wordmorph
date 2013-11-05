@@ -56,15 +56,20 @@ def strip(lines):
         # FIXME: Proposal: if line letters not in /[a-z]/
         #        which is the condition for the algorithm to work
         if [l for l in line if l.isupper()] or "'" in line:
-                log.debug('Stripped line: %s', line)
-                continue
+            log.debug('Stripped line: %s', line)
+            continue
         yield line
 
 def write(file, lines):
     """Writes lines to file if specified, stdout otherwise
     """
     if not file:
-        for line in lines: sys.stdout.write(line)
+        try:
+            for line in lines: sys.stdout.write(line)
+        except IOError:
+            # FIXME: Passes 'Broken pipe' error when using oneliner:
+            # cat linuxwords | python strip.py | python script.py --wordlist words --from cast --to hurt
+            pass
     else:
         try:
             with open(file, 'w') as f:
