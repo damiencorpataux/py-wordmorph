@@ -49,12 +49,15 @@ def args():
         parser.print_help()
         sys.exit(1)
     # Setups logging level
-    level = args.pop('log', None)
-    if level: logging.basicConfig(level=getattr(logging, level))
+    logging.basicConfig(
+        level=getattr(logging, str(args.pop('log', None)), None),
+        format='%(asctime)s - %(levelname)s - %(name)s - %(message)s'
+    )
     return args
 
 def dictionary(file):
-    if not file: sys.stderr.write('Reading from stdin\n')
+    if not file:
+        logging.getLogger(__file__).warn('Reading from stdin')
     f = open(file, 'r') if file else sys.stdin
     return [line.strip() for line in f]
 

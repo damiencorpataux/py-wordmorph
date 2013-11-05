@@ -1,7 +1,11 @@
 #!/usr/bin/python
 
 import sys, argparse
+import logging
 from processor.tools import read, strip, write
+
+logging.basicConfig()
+log = logging.getLogger(__file__)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Strips unclean words for script.py')
@@ -16,7 +20,7 @@ if __name__ == '__main__':
         help='The destination filename to write (writes to stdout if not specified)'
     )   
     args = parser.parse_args().__dict__
-    if not args.get('infile'): sys.stderr.write('Reading from stdin\n')
-    if not args.get('outfile'): sys.stderr.write('Writing to stdout\n')
+    if not args.get('infile'): log.warn('Reading from stdin')
+    if not args.get('outfile'): log.warn('Writing to stdout')
     # Actual processing
     write(args.get('outfile'), strip(read(args.get('infile'))))

@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
 import tools
-import logging as log
+import logging
+
+log = logging.getLogger(__name__)
 
 def combine(path, words, length, distance):
     """Returns all possible combinations of words starting with path

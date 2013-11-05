@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
 import tools
-import logging as log
+import logging
+
+log = logging.getLogger(__name__)
 
 def find(source, target, words, maxlength=3, distance=1):
     """Recursively looks up for all possible word-paths between two words.

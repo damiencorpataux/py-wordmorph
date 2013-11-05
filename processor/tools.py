@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
 import sys
-import logging as log
+import logging
+
+log = logging.getLogger(__name__)
 
 def isdistance(distance, word1, word2):
     """Returns True if the distance between 'word1' and 'word2' is 'distance',
