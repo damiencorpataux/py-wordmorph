@@ -65,6 +65,7 @@ def process(args):
     for path in p.find(words=words, **args):
         for word in path:
             print word
+        break
         
 if __name__ == '__main__':
     process(args())
