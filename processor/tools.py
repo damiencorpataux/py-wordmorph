@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import sys
+
 def isdistance(distance, word1, word2):
     """Returns True if the distance between 'word1' and 'word2' is 'distance',
     False otherwise.
@@ -33,3 +35,35 @@ def nextpath(path, words, distance):
     """
     words = set(words) - set(path)
     for word in neighbourhood(path[-1], words, distance): yield path+[word]
+
+def read(file):
+    """Yields file lines if specified, stdin otherwise.
+    """
+    if not file:
+        for line in sys.stdin: yield line
+    else:
+        with open(file, 'r') as f: 
+            for line in f: yield line
+
+def strip(lines):
+    """Strips words from lines for use with wordmorph
+    """
+    for line in lines:
+        # FIXME: Proposal: if line letters not in /[a-z]/
+        #        which is the condition for the algorithm to work
+        if [l for l in line if l.isupper()] or "'" in line: continue
+        yield line
+
+def write(file, lines):
+    """Writes lines to file if specified, stdout otherwise
+    """
+    if not file:
+        for line in lines: sys.stdout.write(line)
+    else:
+        try:
+            with open(file, 'w') as f:
+                for line in lines: f.write(line)
+        except Exception as e:
+            raise e
+        finally:
+            f.close()

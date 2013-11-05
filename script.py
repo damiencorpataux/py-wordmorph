@@ -54,7 +54,6 @@ def process(args):
     processor = args.pop('processor')
     p = getattr(__import__('processor', globals(), locals(), [processor], -1), processor)
     words = dictionary(args.pop('wordlist'))
-    print args
     for path in p.find(words=words, **args):
         for word in path:
             print word
