@@ -1,67 +1,30 @@
 #!/usr/bin/python
 
-# FIXME: Handle from:cast to:cast case
-#        Yield results to enable yielding found paths
-#        Optimize to find shortest parth first, better algo complexity:
-#        try to change nextpath() instructions order to test shorter combinaisons first
+import sys, argparse
+import logging
 
-dictionary_cache = []
-def dictionary(file='wordlist.clean'):
-    global dictionary_cache
-    if (dictionary_cache): return dictionary_cache
-    with open(file) as f:
-        dictionary_cache = f.read().splitlines()
-    return dictionary_cache
-
-def isdistance(distance, word1, word2):
-    if len(word1) != len(word2): return None
-    actual = 0
-    for i, l in enumerate(word1):
-        if actual > distance: return False
-        if word1[i] != word2[i]: actual += 1
-    if actual == distance: return True 
-    else: return False
-
-def neighbourhood(word, words, distance=1):
-    for candidate in words:
-        if isdistance(distance, candidate, word):
-            yield candidate
-
-def nextpath(path, distance):
-    words = set(dictionary()) - set(path)
-    for word in neighbourhood(path[-1], words, distance): yield path+[word]
-
-def combine(word, length, distance, path=[]):
-    """Returns all possible combinations of paths starting with path
-    with fixed length and neighbourhood distance
-    """
-    if not path: path = [word]
-    for p in nextpath(path, distance):
-        if len(p) == length: yield p
-        if len(p) < length:
-            for x in combine(None, length, distance, p):
-                yield x
-
-def find(source, target, maxlength=None, distance=None):
-    # Inneficient but simple logic that yields shortests first
-    for length in range(2, maxlength+1):
-        for candidate in combine(source, length, distance):
-            if candidate[-1] == target:
-                yield candidate
-
-def cli():
-    import sys, argparse
-    # Using argparser to manage cli argument and help blurb
-    parser = argparse.ArgumentParser(description='Generate paths between words')
+def args():
+    parser = argparse.ArgumentParser(description='Outputs the first found path between two words')
     parser.add_argument('--from',
         dest='source',
         metavar='word',
-        help='the word to be used as source node (mandatory)'
+        help='word to be used as source node (mandatory)'
     )
     parser.add_argument('--to',
         dest='target',
         metavar='word',
-        help='the word to be used as target node (mandatory)'
+        help='word to be used as target node (mandatory)'
+    )
+    parser.add_argument('--wordlist',
+        dest='wordlist',
+        metavar='filename',
+        help='filename of the wordlist to be used (reads stdin if not specified)'
+    )
+    parser.add_argument('--processor',
+        default='combinatory',
+        dest='processor',
+        metavar='name',
+        help='algorithm implementation to use for word processing (default: combinatory)'
     )
     parser.add_argument('--maxlength',
         default=6,
@@ -75,17 +38,38 @@ def cli():
         metavar='int',
         help='max distance between two words'
     )
+    parser.add_argument('--log',
+        metavar='level',
+        help='logging level (DEBUG, INFO)'
+    )
     args = parser.parse_args().__dict__
     # --from and --to are mandatory, although argparser doesnt support this
     missing = [key for key in ['source', 'target'] if not args.get(key)]
     if missing:
         parser.print_help()
         sys.exit(1)
-    # Results display
-    for path in find(**args):
+    # Setups logging level
+    level = args.pop('log', None)
+    if level: logging.basicConfig(level=getattr(logging, level))
+    return args
+
+def dictionary(file):
+    if not file: sys.stderr.write('Reading from stdin\n')
+    f = open(file, 'r') if file else sys.stdin
+    return [line.strip() for line in f]
+
+def process(args):
+    words = dictionary(args.pop('wordlist'))
+    #import processor.tools
+    #words = [w.strip() for w in processor.tools.read('words')]
+    # import processor.{processor} as p
+    processor = args.pop('processor')
+    p = getattr(__import__('processor', globals(), locals(), [processor], -1), processor)
+    # Prints the first found path
+    for path in p.find(words=words, **args):
         for word in path:
             print word
-        break
-
+        sys.exit(0)
+        
 if __name__ == '__main__':
-    cli()
+    process(args())
