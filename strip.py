@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import argparse
+import sys, argparse
 from processor.tools import read, strip, write
 
 if __name__ == '__main__':
@@ -16,5 +16,7 @@ if __name__ == '__main__':
         help='The destination filename to write (writes to stdout if not specified)'
     )   
     args = parser.parse_args().__dict__
+    if not args.get('infile'): sys.stderr.write('Reading from stdin\n')
+    if not args.get('outfile'): sys.stderr.write('Writing to stdout\n')
     # Actual processing
     write(args.get('outfile'), strip(read(args.get('infile'))))

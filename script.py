@@ -3,12 +3,8 @@
 import sys, argparse
 import logging
 
-def dictionary(file):
-    f = open(file, 'r') if file else sys.stdin
-    for line in f: yield line.strip()
-
 def args():
-    parser = argparse.ArgumentParser(description='Outputs the shortest path between two words')
+    parser = argparse.ArgumentParser(description='Outputs the first found path between two words')
     parser.add_argument('--from',
         dest='source',
         metavar='word',
@@ -52,20 +48,28 @@ def args():
     if missing:
         parser.print_help()
         sys.exit(1)
-    # Setups loggin level
+    # Setups logging level
     level = args.pop('log', None)
     if level: logging.basicConfig(level=getattr(logging, level))
     return args
 
+def dictionary(file):
+    if not file: sys.stderr.write('Reading from stdin\n')
+    f = open(file, 'r') if file else sys.stdin
+    return [line.strip() for line in f]
+
 def process(args):
-    # from processor import {processor} as p
+    words = dictionary(args.pop('wordlist'))
+    #import processor.tools
+    #words = [w.strip() for w in processor.tools.read('words')]
+    # import processor.{processor} as p
     processor = args.pop('processor')
     p = getattr(__import__('processor', globals(), locals(), [processor], -1), processor)
-    words = dictionary(args.pop('wordlist'))
+    # Prints the first found path
     for path in p.find(words=words, **args):
         for word in path:
             print word
-        break
+        sys.exit(0)
         
 if __name__ == '__main__':
     process(args())

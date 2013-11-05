@@ -12,17 +12,8 @@ def find(source, target, words, maxlength=3, distance=1):
     if not isinstance(source, list): source = [source]
     if len(source) < maxlength:
         for path in tools.nextpath(source, words, distance):
-            if path[-1] == target: yield path
-            for path in find(path, target, words, maxlength, distance):
+            if path[-1] == target:
                 log.info('Found path: %s', path)
                 yield path
-
-if __name__ == '__main__':
-    import sys
-    for path in find(
-        source='cast',
-        target='hurt',
-        maxlength=4,
-        words=[l.strip() for l in sys.stdin]
-    ):
-        print path
+            for path in find(path, target, words, maxlength, distance):
+                yield path

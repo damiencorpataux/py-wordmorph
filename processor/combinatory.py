@@ -21,13 +21,3 @@ def find(source, target, words, maxlength=4, distance=1):
             if candidate[-1] == target:
                 log.info('Found path: %s', candidate)
                 yield candidate
-
-if __name__ == '__main__':
-    import sys
-    for path in find(
-        source='cast',
-        target='hurt',
-        maxlength=4,
-        words=[l.strip() for l in sys.stdin]
-    ):
-        print path
