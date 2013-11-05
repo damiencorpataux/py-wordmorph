@@ -19,7 +19,7 @@ python script.py --wordlist words --from cast --to hurt
 
 You can also pipe data:
 ```
-cat linuxwords | python strip.py | python script.py --wordlist words --from cast --to hurt
+cat linuxwords | python strip.py | python script.py --from cast --to hurt
 ```
 
 
